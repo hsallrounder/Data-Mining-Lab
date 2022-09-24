@@ -1,0 +1,104 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+```{r}
+print("hehe")
+```
+```{r}
+install.packages("nycflights13")
+```
+```{r}
+data <- read.csv(file.choose(),header = T)
+head(data)
+```
+
+
+```{r}
+tail(data)
+```
+```{r}
+data <- library(nycflights13)
+```
+```{r}
+data
+```
+```{r}
+install.packages("DataExplorer")
+data <- library(DataExplorer)
+head(data)
+```
+```{r}
+data_list <- list(airlines,airports,flights,planes,weather)
+plot_str(data_list,type = "r")
+```
+```{r}
+merger_airlines <- merge(flights,airlines,by = "carrier",all.x = TRUE)
+plot_str(merger_airlines)
+```
+```{r}
+merge_planes <- merge(merger_airlines,planes,by = "tailnum", all.x = TRUE)
+plot_str(merge_planes)
+```
+```{r}
+merge_airports_origin <- merge(merge_planes,airports,by.x = "origin", by.y = "faa", all.x = TRUE, suffixes = c("_carrier","_origin"))
+plot_str(merge_airports_origin)
+```
+```{r}
+final_data <- merge(merge_airports_origin,airports,by.x = "dest",by.y = "faa", all.x = TRUE, suffixes = c("_origin","_dest"))
+head(final_data["faa"],20)
+```
+```{r}
+#introduce(final_data)
+plot_intro(final_data)
+```
+```{r}
+plot_missing(final_data)
+```
+```{r}
+plot_bar(final_data)
+```
+```{r}  
+plot_histogram(final_data)
+```
+```{r}
+final_data <- update_columns(final_data,"flight",as.factor)
+head(final_data)
+#final_data <- drop_columns(final_data,c("tz_origin"))
+```
+```{r}
+#Q-Q plot is a way to visualize the deviation from a specific probability distribution.
+qq_data <- final_data[,c("arr_delay","air_time","distance","seats")]
+#plot_qq(qq_data,sampled_rows = 100L)
+```
+
+```{r}
+plot_qq(qq_data,sampled_rows = 100L)
+```
+```{r}
+log_qq_data <- update_columns(qq_data,2:4,function(x)log(x+1))
+plot_qq(log_qq_data[,2:4],sampled_rows = 100L)
+```
+```{r}
+qq_data <- final_data[,c("name_origin","arr_delay","air_time","distance","seats")]
+```
+```{r}
+plot_qq(qq_data,by="name_origin",sampled_rows = 1000L)
+```
+```{r}
+plot_correlation(na.omit(final_data),maxcat = 5L,type = "d")
+```
+```{r}
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
